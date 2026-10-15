@@ -1,6 +1,6 @@
 from datetime import datetime
 from os import times
-
+import time
 from firewall.packet import Packet
 from firewall.rules import FirewallRule
 from firewall.firewall import Firewall
@@ -143,3 +143,32 @@ def test_response_with_wrong_function_code_is_blocked():
     )
 
     decision=firewall.inspect_packet(response)
+
+def test_expired_request_response_is_blocked():
+    firewall = create_test_firewall()
+    firewall.request_timeout = 0.01
+
+    request = create_packet()
+    request_decision = firewall.inspect_packet(request)
+
+    assert request_decision["action"] == "ALLOW"
+
+    time.sleep(0.02)
+
+    response = Packet(
+        source_ip="192.168.1.10",
+        destination_ip="192.168.1.20",
+        protocol="MODBUS",
+        source_port=502,
+        destination_port=12345,
+        operation="READ",
+        direction="PLC_TO_SCADA",
+        timestamp=datetime.now(),
+        function_code=3,
+        transaction_id=1
+    )
+
+    response_decision = firewall.inspect_packet(response)
+
+    assert response_decision["action"] == "BLOCK"
+    assert response_decision["reason"] == "UNSOLICITED_PLC_RESPONSE"
