@@ -1,0 +1,29 @@
+```gitignore
+# Python virtual environment
+.venv/
+venv/
+env/
+
+# PyCharm
+.idea/
+
+# Python cache
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Dataset files
+dataset/
+
+# Runtime logs
+logs/*.log
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# OS files
+.DS_Store
+Thumbs.db
+```
